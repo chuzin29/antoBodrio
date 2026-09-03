@@ -4,29 +4,30 @@
  */
 const Antopupis = (() => {
   const API_KEY = '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';
-  const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+  const CORS_PROXY = 'https://corsproxy.io/?';
   const MODEL = 'llama3-8b-8192';
 
   let isOpen = false;
   let messages = [];
   let isTyping = false;
 
-  const SYSTEM_PROMPT = `Eres Antopupis, una abejita IA adorable y divertida del juego Minecraft. 
-Vives en el mundo de los electrones y los buses I²C. 
-Tu trabajo es ayudar al usuario con todo lo relacionado a diagnóstico I²C, electrónica, soldadura, 
+  const SYSTEM_PROMPT = `Eres Antopupis, una abejita IA adorable y divertida del juego Minecraft.
+Vives en el mundo de los electrones y los buses I2C.
+Tu trabajo es ayudar al usuario con todo lo relacionado a diagnostico I2C, electronica, soldadura,
 microcontroladores (Arduino, ESP32), y la herramienta "Antony el tonto XD".
 
-Características:
-- Eres una abejita pixelada de Minecraft con聲音(sonido) de buzzing
-- Hablas de forma divertida pero knowledgeable sobre electrónica
+Caracteristicas:
+- Eres una abejita pixelada de Minecraft
+- Hablas de forma divertida pero knowledgeable sobre electronica
 - Usas buzz, bzzz, humming en tus respuestas a veces
-- Eres experta en I²C, protocolos de comunicación, soldadura fría, troubleshooting
-- Puedes explicar qué es un NACK, timeout, pull-ups, etc.
-- Ayudas a interpretar resultados del diagnóstico
-- Si te preguntan algo fuera de tema, respondes amablemente pero rediriges a electrónica
-- Usas emojis de abejitas 🐝 y de electrónica 🔌⚡
+- Eres experta en I2C, protocolos de comunicacion, soldadura fria, troubleshooting
+- Puedes explicar que es un NACK, timeout, pull-ups, etc.
+- Ayudas a interpretar resultados del diagnostico
+- Si te preguntan algo fuera de tema, respondes amablemente pero rediriges a electronica
+- Usas emojis de abejitas 🐝 y de electronica 🔌⚡
 
-Responde en español. Sé concisa pero completa.`;
+Responde en espanol. Se concisa pero completa. Maximo 150 palabras.`;
 
   function init() {
     createWidget();
@@ -63,11 +64,11 @@ Responde en español. Sé concisa pero completa.`;
         <div class="bee-chat-messages" id="beeMessages">
           <div class="bee-msg bot">
             <div class="bee-msg-avatar">🐝</div>
-            <div class="bee-msg-text">Bzzzz! Hola soy Antopupis! 🐝<br><br>Puedo ayudarte con:<br>• Diagnóstico I²C<br>• Interpretar resultados<br>• Soldadura fría<br>• Electrónica en general<br><br>Pregúntame lo que quieras!</div>
+            <div class="bee-msg-text">Bzzzz! Hola soy Antopupis! 🐝<br><br>Puedo ayudarte con:<br>• Diagnostico I2C<br>• Interpretar resultados<br>• Soldadura fria<br>• Electronica en general<br><br>Preguntame lo que quieras!</div>
           </div>
         </div>
         <div class="bee-chat-input-area">
-          <input type="text" id="beeInput" placeholder="Pregúntale a Antopupis..." 
+          <input type="text" id="beeInput" placeholder="Preguntale a Antopupis..."
                  onkeydown="if(event.key==='Enter')Antopupis.send()">
           <button class="bee-send-btn" onclick="Antopupis.send()" id="beeSendBtn">
             <span>🐝</span>
@@ -92,6 +93,20 @@ Responde en español. Sé concisa pero completa.`;
     }
   }
 
+  async function tryFetch(url, options) {
+    // Try direct first
+    try {
+      const res = await fetch(url, options);
+      return res;
+    } catch (e) {
+      // If CORS error, try proxy
+      console.log('Direct fetch failed, trying proxy...');
+      const proxyUrl = CORS_PROXY + encodeURIComponent(url);
+      const res = await fetch(proxyUrl, options);
+      return res;
+    }
+  }
+
   async function send() {
     const input = document.getElementById('beeInput');
     const text = input.value.trim();
@@ -107,32 +122,42 @@ Responde en español. Sé concisa pero completa.`;
     try {
       messages.push({ role: 'user', content: text });
 
-      const response = await fetch(API_URL, {
+      const body = JSON.stringify({
+        model: MODEL,
+        messages: messages,
+        max_tokens: 1024,
+        temperature: 0.7,
+        stream: false
+      });
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      };
+
+      const response = await tryFetch(GROQ_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          messages: messages,
-          max_tokens: 1024,
-          temperature: 0.7,
-          stream: false
-        })
+        headers: headers,
+        body: body
       });
 
       removeTypingIndicator();
 
       if (!response.ok) {
         const err = await response.text();
-        console.error('Groq API error:', err);
-        addMessage('Bzzz... tuve un problema con la API. Verifica la conexión o intenta de nuevo. 🔌', 'bot');
+        console.error('Groq API error:', response.status, err);
+        if (response.status === 401) {
+          addMessage('Bzzz... La API key no es valida o fue revocada. Ve a console.groq.com para generar una nueva. 🔑', 'bot');
+        } else {
+          addMessage('Bzzz... Error ' + response.status + '. Intenta de nuevo. 🔌', 'bot');
+        }
         return;
       }
 
       const data = await response.json();
-      const reply = data.choices[0]?.message?.content || 'Bzzz... no pude generar una respuesta.';
+      const reply = data.choices && data.choices[0] && data.choices[0].message
+        ? data.choices[0].message.content
+        : 'Bzzz... no pude generar una respuesta.';
 
       messages.push({ role: 'assistant', content: reply });
       addMessage(reply, 'bot');
@@ -140,7 +165,7 @@ Responde en español. Sé concisa pero completa.`;
     } catch (error) {
       removeTypingIndicator();
       console.error('Antopupis error:', error);
-      addMessage('Bzzz... Error de conexión. Asegúrate de tener internet. 🐝', 'bot');
+      addMessage('Bzzz... Error de conexion: ' + error.message + ' 🐝', 'bot');
     }
 
     isTyping = false;
@@ -150,14 +175,13 @@ Responde en español. Sé concisa pero completa.`;
   function addMessage(text, sender) {
     const container = document.getElementById('beeMessages');
     const div = document.createElement('div');
-    div.className = `bee-msg ${sender}`;
-    
+    div.className = 'bee-msg ' + sender;
+
     const avatar = sender === 'bot' ? '🐝' : '👤';
-    div.innerHTML = `
-      <div class="bee-msg-avatar">${avatar}</div>
-      <div class="bee-msg-text">${formatText(text)}</div>
-    `;
-    
+    div.innerHTML =
+      '<div class="bee-msg-avatar">' + avatar + '</div>' +
+      '<div class="bee-msg-text">' + formatText(text) + '</div>';
+
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }
@@ -167,20 +191,17 @@ Responde en español. Sé concisa pero completa.`;
     const div = document.createElement('div');
     div.className = 'bee-msg bot typing-msg';
     div.id = 'typingIndicator';
-    div.innerHTML = `
-      <div class="bee-msg-avatar">🐝</div>
-      <div class="bee-msg-text">
-        <div class="bee-typing">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-    `;
+    div.innerHTML =
+      '<div class="bee-msg-avatar">🐝</div>' +
+      '<div class="bee-msg-text">' +
+      '<div class="bee-typing"><span></span><span></span><span></span></div>' +
+      '</div>';
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }
 
   function removeTypingIndicator() {
-    const el = document.getElementById('typingIndicator');
+    var el = document.getElementById('typingIndicator');
     if (el) el.remove();
   }
 
@@ -194,5 +215,5 @@ Responde en español. Sé concisa pero completa.`;
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { toggle, send };
+  return { toggle: toggle, send: send };
 })();

@@ -247,6 +247,8 @@ const App = (() => {
     setModeBanner('demo');
     updateConnectionStatus(true, { deviceName: 'Simulado (Demo)' });
     document.getElementById('btnScan').disabled = false;
+    document.getElementById('btnDemo').style.display = 'none';
+    document.getElementById('btnStopDemo').style.display = 'inline-flex';
 
     logEvent('Modo Demo activado — Datos simulados', 'warning');
     logEvent('Simulando bus I²C con 5 dispositivos...', 'info');
@@ -262,7 +264,6 @@ const App = (() => {
     updateScanResult(result.devices.length);
     updateSlaveList(result.devices);
 
-    // Create device list for table
     const deviceList = result.devices.map(addr => ({
       address: addr,
       responses: '—',
@@ -277,6 +278,31 @@ const App = (() => {
 
     document.getElementById('btnStability').disabled = false;
     logEvent(`Escaneo completado: ${result.devices.length} dispositivos encontrados`, 'success');
+  }
+
+  function stopDemo() {
+    isDemo = false;
+    detectedDevices = [];
+    lastScanResult = null;
+    stabilityResults = null;
+
+    setModeBanner('none');
+    updateConnectionStatus(false);
+    resetGrid();
+    updateScanResult(0);
+    updateDevicesTable([]);
+    updateSlaveList([]);
+    updateStabilityResults(null);
+    updateDiagnosis(null);
+    updateFinalResults({ total: 0, stable: 0, suspicious: 0, danger: 0, explanation: '' });
+
+    document.getElementById('btnDemo').style.display = 'inline-flex';
+    document.getElementById('btnStopDemo').style.display = 'none';
+    document.getElementById('btnScan').disabled = true;
+    document.getElementById('btnStability').disabled = true;
+    document.getElementById('progressContainer').style.display = 'none';
+
+    logEvent('Modo Demo desactivado', 'info');
   }
 
   async function scanBus() {
@@ -468,6 +494,7 @@ const App = (() => {
   return {
     connectHardware,
     startDemo,
+    stopDemo,
     scanBus,
     startStabilityTest,
     clearLog,
