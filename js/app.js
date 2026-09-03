@@ -459,6 +459,15 @@ const App = (function() {
     clearLog: clearLog,
     exportLog: exportLog,
     exportJSON: exportJSON,
-    exportCSV: exportCSV
+    exportCSV: exportCSV,
+    getState: function() {
+      return {
+        isDemo: isDemo,
+        isHardwareConnected: isHardwareConnected,
+        detectedDevices: detectedDevices.slice(),
+        stabilityResults: stabilityResults,
+        master: document.getElementById('masterDevice') ? document.getElementById('masterDevice').textContent : ''
+      };
+    }
   };
 })();

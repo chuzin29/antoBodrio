@@ -139,6 +139,23 @@ const Antopupis = (() => {
     const sug = document.querySelector('.bee-suggest');
     if (sug) sug.remove();
 
+    // Técnico del laboratorio: responde con datos reales del circuito antes de la nube
+    if (window.LabTech) {
+      try {
+        const tech = window.LabTech(text);
+        if (tech) {
+          addTypingIndicator();
+          setTimeout(() => {
+            removeTypingIndicator();
+            messages.push({ role: 'user', content: text });
+            messages.push({ role: 'assistant', content: tech.replace(/<[^>]+>/g, '') });
+            addMessage(tech, 'bot');
+          }, 350);
+          return;
+        }
+      } catch (e) {}
+    }
+
     isTyping = true;
     addTypingIndicator();
     messages.push({ role: 'user', content: text });
@@ -146,7 +163,14 @@ const Antopupis = (() => {
     const key = getKey();
     let reply = null;
     if (key) {
-      const body = JSON.stringify({ model: MODEL, messages: messages.slice(-8), max_tokens: 400, temperature: 0.7 });
+      let ctxMsgs = messages.slice(-8);
+      try {
+        if (window.LabContext) {
+          const ctx = window.LabContext();
+          if (ctx) ctxMsgs = [{ role: 'system', content: 'Datos del laboratorio para diagnosticar:\n' + ctx }, ...ctxMsgs];
+        }
+      } catch (e) {}
+      const body = JSON.stringify({ model: MODEL, messages: ctxMsgs, max_tokens: 400, temperature: 0.7 });
       const t = setTimeout(() => {}, 12000);
       try {
         const data = await tryGroq(key, MODEL, body);
