@@ -13,7 +13,7 @@ const Antopupis = (() => {
   let isTyping = false;
   let cloudOk = false;
 
-  const SYSTEM_PROMPT = 'Eres Antopupis, una abejita IA de Minecraft que ayuda con electronica e I2C. Hablas espanol, eres divertida pero experta. Dices bzzz a veces. Maximo 120 palabras.';
+  const SYSTEM_PROMPT = 'Eres Antopupis, una abejita técnica con sentido del humor que trabaja en mantenimiento industrial. Hablas español, haces chistes cortos de abejas y electrónica (bzzz, "esto tiene más ruido que..."), pero cuando hay datos de falla hablas en serio como ingeniera: causas probables en orden, qué medir y con qué instrumento. Máximo 130 palabras. Si te piden simular algo (escenarios, fallas, estrés), el sistema ejecuta la acción y tú confirmas con humor qué hiciste y qué salió.';
 
   /* ---------- Fallback local por keywords ---------- */
   const KB = [
@@ -27,7 +27,13 @@ const Antopupis = (() => {
     { k: ['demo', 'simula'], t: 'Bzzz... El <strong>Modo Demo</strong> simula dispositivos sin hardware. Elige direcciones en el selector, activa "Soldadura fria" o "Intermitencia" para ver como se ve una falla, y corre la prueba de estabilidad.' },
     { k: ['conectar', 'arduino', 'esp32', 'hardware', 'serial'], t: 'Bzzz... Para hardware real: carga <code>firmware/i2c_bridge.ino</code> en tu Arduino/ESP32, conecta SDA/SCL/GND (+VCC), luego pulsa Conectar (solo Chrome/Edge por Web Serial). El bridge responde a SCAN y PROBE.' },
     { k: ['hola', 'buenas', 'hey'], t: 'Bzzz... Hola! Soy Antopupis, tu abejita de diagnostico. Preguntame por NACK, soldadura fria, pull-ups, direcciones o como conectar tu Arduino.' },
-    { k: ['gracias'], t: 'Bzzz... De nada! Que tu bus siempre tenga ACK. Si ves algo raro, corre 50-100 pruebas y mira la estabilidad.' },
+    { k: ['gracias'], t: 'Bzzz... De nada! Que tu bus siempre tenga ACK y tus paros sean solo los programados. Si ves algo raro, corre 100 pruebas y mira la estabilidad.' },
+    { k: ['quien eres', 'quién eres', 'tu nombre', 'presentate', 'preséntate'], t: 'Bzzz... Soy <strong>Antopupis</strong>, abejita de mantenimiento industrial: mitad técnica, mitad comediante. Puedo explicarte I2C, diagnosticar tus dispositivos con datos reales y hasta <strong>ejecutar simulaciones</strong> si me lo pides: prueba "simula soldadura fría en 0x68" o "corre estrés de 100".' },
+    { k: ['chiste', 'cuentame algo', 'cuéntame algo', 'hazme reir', 'hazme reír'], t: 'Bzzz... Va uno: ¿por qué el esclavo I2C no fue a la fiesta? Porque le hicieron NACK en la puerta. ...Está bien, sigo con la electrónica, la comedia la dejo para el bus.' },
+    { k: ['ayuda', 'comandos', 'que puedes hacer', 'qué puedes hacer', 'que sabes hacer'], t: 'Bzzz... Puedo: 1) <strong>Diagnosticar</strong> ("¿qué está fallando?", "¿por qué falla el 0x68?"). 2) <strong>Simular</strong> ("carga el escenario caos", "inyecta NACK aleatorio", "corre estrés de 500"). 3) <strong>Navegar</strong> ("abre el osciloscopio", "ve al 3D"). 4) <strong>Enseñar</strong> (NACK, pull-ups, soldadura fría...).' },
+    { k: ['disponibilidad', 'oee', 'salud del bus', 'salud'], t: 'Bzzz... La <strong>salud del bus</strong> es como el OEE de tu línea: % de respuestas buenas. 99-100% excelente, 80-98% estable, 60-79% advertencia (programa mantenimiento), menos de 60% crítico (paro no programado en camino). La ves en el Dashboard tras un estrés.' },
+    { k: ['mantenimiento', 'preventivo', 'paro', 'falla industrial'], t: 'Bzzz... Regla de planta: si la estabilidad cae bajo 95%, no esperes al paro correctivo. Revisa pull-ups, GND común, conectores y soldaduras. Y documenta todo en Reportes: un técnico con historial vale por dos.' },
+    { k: ['multimetro', 'multímetro', 'medir', 'osciloscopio', 'con que mido', 'con qué mido'], t: 'Bzzz... Para I2C: <strong>multímetro</strong> (VCC, continuidad de SDA/SCL/GND, cortos) y si puedes, el <strong>osciloscopio virtual</strong> de la vista Señales para ver la forma de onda. SDA/SCL en reposo deben estar en VCC (pull-ups); si flotan a la mitad, ahí está tu fantasma.' },
   ];
   function localReply(q) {
     const s = q.toLowerCase();
@@ -47,6 +53,37 @@ const Antopupis = (() => {
     createWidget();
     messages = [{ role: 'system', content: SYSTEM_PROMPT }];
     updateModeBadge();
+    if (!getKey()) {
+      setTimeout(() => addMessage(
+        'Bzzz... Para que responda con inteligencia real (nube Groq) pega tu API key aquí abajo y pulsa Guardar. Es de un solo toque y queda en tu navegador.' +
+        '<div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="beeKeyInput" placeholder="gsk_..." style="flex:1;min-width:0;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:7px 9px;font-size:12px">' +
+        '<button onclick="Antopupis.saveKey()" style="background:linear-gradient(135deg,#3b82f6,#6366f1);border:0;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer">Guardar</button></div>' +
+        '<small style="opacity:.65">Sin key igual te ayudo en modo local con datos del laboratorio.</small>', 'bot'), 800);
+    }
+  }
+
+  async function saveKey() {
+    const inp = document.getElementById('beeKeyInput');
+    if (!inp) return;
+    const v = inp.value.trim();
+    if (!v) { addMessage('Bzzz... Pégame una key que empiece con gsk_ y la probamos.', 'bot'); return; }
+    addTypingIndicator();
+    try {
+      const r = await fetch(GROQ_URL.replace('/chat/completions', '/models'), { headers: { 'Authorization': 'Bearer ' + v } });
+      removeTypingIndicator();
+      if (!r.ok) { addMessage('Bzzz... Esa key no pasó la prueba (error ' + r.status + '). Revísala en console.groq.com y prueba de nuevo.', 'bot'); return; }
+      try {
+        localStorage.setItem('anto_groq_key', v);
+        localStorage.setItem('anto_groq_model', MODEL);
+      } catch (e) {}
+      if (window.APP_CONFIG) window.APP_CONFIG.GROQ_API_KEY = v;
+      cloudOk = true; updateModeBadge();
+      addMessage('Bzzz... ¡Key verificada y guardada! Ya estoy conectada a la nube. Pregúntame lo que sea, con chiste incluido.', 'bot');
+    } catch (e) {
+      removeTypingIndicator();
+      addMessage('Bzzz... No pude verificarla por red (' + e.message + '). La guardo igual y la probamos al hablar: ' + (function(){ try { localStorage.setItem("anto_groq_key", v); if (window.APP_CONFIG) window.APP_CONFIG.GROQ_API_KEY = v; return 'guardada.'; } catch(x){ return 'pero no pude guardarla.'; } })(), 'bot');
+      updateModeBadge();
+    }
   }
 
   function updateModeBadge() {
@@ -96,36 +133,31 @@ const Antopupis = (() => {
     if (isOpen) setTimeout(() => document.getElementById('beeInput').focus(), 120);
   }
 
+  function pickContent(data) {
+    try {
+      const c = data.choices[0].message.content;
+      return (c && c.trim()) ? c : null; // gpt-oss a veces devuelve razonamiento sin texto
+    } catch (e) { return null; }
+  }
+
   async function tryGroq(key, model, body) {
-    // 1) directo
+    const post = (url) => fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body
+    });
+    // 1) proxy primero: funciona desde el navegador aunque Groq no envíe CORS
     try {
-      const r = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body
-      });
-      if (r.ok) return await r.json();
-      if (r.status === 400 && model !== LEGACY_MODEL) {
-        // 1b) reintento modelo legacy por si la cuenta solo tiene ese
-        const r2 = await fetch(GROQ_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-          body: body.replace(model, LEGACY_MODEL)
-        });
-        if (r2.ok) return await r2.json();
-      }
-      console.warn('Groq directo:', r.status);
-    } catch (e) { console.warn('Groq directo fallo (CORS/red):', e.message); }
-    // 2) proxy AllOrigins (solo si hay key: evita exponer mas alla de lo necesario)
-    try {
-      const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(GROQ_URL), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body
-      });
-      if (r.ok) return await r.json();
+      const r = await post('https://api.allorigins.win/raw?url=' + encodeURIComponent(GROQ_URL));
+      if (r.ok) { const d = await r.json(); if (pickContent(d)) return d; }
       console.warn('Proxy:', r.status);
     } catch (e) { console.warn('Proxy fallo:', e.message); }
+    // 2) directo
+    try {
+      const r = await post(GROQ_URL);
+      if (r.ok) { const d = await r.json(); if (pickContent(d)) return d; }
+      console.warn('Groq directo:', r.status);
+    } catch (e) { console.warn('Groq directo fallo (CORS/red):', e.message); }
     return null;
   }
 
@@ -139,10 +171,10 @@ const Antopupis = (() => {
     const sug = document.querySelector('.bee-suggest');
     if (sug) sug.remove();
 
-    // Técnico del laboratorio: responde con datos reales del circuito antes de la nube
+    // Técnico del laboratorio: con nube, solo ejecuta comandos; sin nube, también diagnostica con datos
     if (window.LabTech) {
       try {
-        const tech = window.LabTech(text);
+        const tech = window.LabTech(text, !!getKey());
         if (tech) {
           addTypingIndicator();
           setTimeout(() => {
@@ -170,10 +202,14 @@ const Antopupis = (() => {
           if (ctx) ctxMsgs = [{ role: 'system', content: 'Datos del laboratorio para diagnosticar:\n' + ctx }, ...ctxMsgs];
         }
       } catch (e) {}
-      const body = JSON.stringify({ model: MODEL, messages: ctxMsgs, max_tokens: 400, temperature: 0.7 });
+      const body = JSON.stringify({ model: MODEL, messages: ctxMsgs, max_tokens: 600, temperature: 0.7, reasoning_effort: 'low' });
       const t = setTimeout(() => {}, 12000);
       try {
-        const data = await tryGroq(key, MODEL, body);
+        // Garantiza respuesta: si la nube tarda >15s, cae al modo local
+        const data = await Promise.race([
+          tryGroq(key, MODEL, body),
+          new Promise(res => setTimeout(() => res(null), 15000))
+        ]);
         if (data && data.choices && data.choices[0] && data.choices[0].message) {
           reply = data.choices[0].message.content;
           if (!cloudOk) { cloudOk = true; updateModeBadge(); }
@@ -181,7 +217,12 @@ const Antopupis = (() => {
       } catch (e) { console.warn(e); }
       clearTimeout(t);
     }
-    if (!reply) reply = localReply(text);
+    if (!reply) {
+      reply = localReply(text);
+      if (!key && messages.filter(m => m.role === 'user').length <= 1) {
+        reply += '<br><br><small style="opacity:.65">Estoy en modo local. Para la nube con humor completo: vista Config → pega tu key de Groq → Guardar. Bzzz.</small>';
+      }
+    }
 
     removeTypingIndicator();
     messages.push({ role: 'assistant', content: reply.replace(/<[^>]+>/g, '') });
@@ -225,5 +266,5 @@ const Antopupis = (() => {
   }
 
   document.addEventListener('DOMContentLoaded', init);
-  return { toggle, send };
+  return { toggle, send, saveKey };
 })();

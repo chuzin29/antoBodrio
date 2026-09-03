@@ -100,7 +100,8 @@ const LabUI = (() => {
     document.querySelectorAll('main.main-container [data-view-card]').forEach(el => {
       el.classList.toggle('view-hidden', el.dataset.viewCard !== v);
     });
-    if (v === 'lab' && window.Sim3D) Sim3D.init();
+    if (v === 'lab' && window.Sim3D) { Sim3D.init(); setTimeout(() => { try { Sim3D.rebuild(); } catch (e) {} }, 350); }
+    if (v === 'signals' && window.Scope) setTimeout(() => { try { Scope.capture(); } catch (e) {} }, 150);
     if (window.UX) UX.refreshReveal();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -333,12 +334,58 @@ const LabUI = (() => {
   }
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { build(); window.LabContext = labContext; }, 50));
-  return { show, refreshDashboard, renderHistory, lastStress: () => lastStress, labContext };
+  return { show, refreshDashboard, renderHistory, lastStress: () => lastStress, labContext,
+    cmd: {
+      goto: v => show(v),
+      scenario: id => { const s = Scenarios.apply(id); const c = document.getElementById('chkPullups'); if (c) c.checked = VLab.getPullups(); refreshLab(); show('lab'); return s; },
+      fault: (k, on) => { const o = {}; o[k] = on !== false; VLab.setFaults(o); refreshLab(); show('lab'); },
+      clearFaults: () => { VLab.setFaults({ sdaCut: false, sclCut: false, gndCut: false, badVcc: false, dupAddr: false, randNack: false, timeout: false, noise: false, intermittent: false, coldSolder: false, deadDev: false }); refreshLab(); },
+      stress: n => { const s = document.getElementById('selStress'); if (s) s.value = String(n); show('diag'); runStress(); },
+      scan: () => { const r = VLab.simScan(); renderBusMap(); show('i2c'); return r; }
+    } };
 })();
 
-/** Técnico IA: responde con datos del lab antes de usar la nube */
-window.LabTech = function (q) {
+/** Técnico IA: ejecuta simulaciones y responde con datos del lab antes de la nube */
+window.LabTech = function (q, cmdsOnly) {
   const s = q.toLowerCase();
+  const cmd = window.LabUI && LabUI.cmd;
+  const joke = h => h + ' Bzzz.';
+  // ---- Comandos de simulación ----
+  if (cmd) {
+    const scMap = [['caos', 'chaos'], ['soldadura', 'cold'], ['intermitente', 'intermit'], ['duplicad', 'dupaddr'], ['desconectado', 'disconn'], ['sda cortado', 'sdacut'], ['scl cortado', 'sclcut'], ['dañado', 'dead'], ['perfecto', 'perfect']];
+    let m = s.match(/(?:carga|pon|simula|activa|escenario)\s+(?:el\s+)?(?:escenario\s+)?(.+)/);
+    if (m) {
+      for (const [k, id] of scMap) {
+        if (m[1].includes(k)) {
+          const sc = cmd.scenario(id);
+          return joke('Listo: cargué <strong>' + sc.name + '</strong> (' + sc.desc + '). Ya manché el bus de miel... digo, de fallas. Corre un estrés y vemos qué llora primero.');
+        }
+      }
+    }
+    const fMap = [['sda desconectado', 'sdaCut'], ['scl desconectado', 'sclCut'], ['gnd', 'gndCut'], ['alimentaci', 'badVcc'], ['duplicada', 'dupAddr'], ['nack', 'randNack'], ['timeout', 'timeout'], ['ruido', 'noise'], ['intermiten', 'intermittent'], ['soldadura', 'coldSolder'], ['dañado', 'deadDev']];
+    m = s.match(/(?:inyecta|mete|pon|activa|simula)\s+(.+)/);
+    if (m && /falla|nack|timeout|ruido|corte|sda|scl|gnd|soldadura|dañado|duplicada|alimentaci|intermiten/.test(m[1])) {
+      for (const [k, fk] of fMap) {
+        if (m[1].includes(k)) { cmd.fault(fk, true); return joke('Falla inyectada: <strong>' + k + '</strong>. El bus ya está temblando. Ejecuta un diagnóstico y atrápala con las manos en la masa.'); }
+      }
+    }
+    if (/quit.*falla|limpia.*falla|repara todo|sistema perfecto/.test(s)) { cmd.clearFaults(); cmd.scenario('perfect'); return joke('Fallas retiradas, bus como nuevo. Hasta la abeja pasó la escoba.'); }
+    m = s.match(/(?:corre|ejecuta|haz|inicia).{0,12}estr[eé]s(?:\s+de\s+(\d+))?/);
+    if (m) {
+      const n = parseInt(m[1] || '100');
+      const it = [10, 50, 100, 500, 1000, 10000].includes(n) ? n : 100;
+      cmd.stress(it);
+      return joke('Estrés de <strong>' + it + '</strong> pruebas en marcha. Voy preparando el parte de daños...');
+    }
+    if (/escanea/.test(s)) { const r = cmd.scan(); return joke('Escaneo virtual: encontré <strong>' + r.devices.length + '</strong> dispositivo(s) (' + r.devices.map(a => VLab.fmtAddr(a)).join(', ') + '). Los tímidos que no respondieron... ya sabemos por qué.'); }
+    m = s.match(/(?:abre|ve|muestra|ir).{0,10}(osciloscopio|se[ñn]ales|3d|laboratorio|diagn[oó]stico|dashboard|arduino|reportes|componentes|aprender|config)/);
+    if (m) {
+      const vMap = { osciloscopio: 'signals', 'señales': 'signals', '3d': 'lab', laboratorio: 'lab', 'diagnóstico': 'diag', dashboard: 'dashboard', arduino: 'arduino', reportes: 'reports', componentes: 'components', aprender: 'learn', config: 'config' };
+      const t = Object.keys(vMap).find(k => m[1].includes(k));
+      if (t) { cmd.goto(vMap[t]); return joke('Abriendo <strong>' + t + '</strong>. Ponte el casco.'); }
+    }
+  }
+  if (cmdsOnly) return null; // con nube, el diagnóstico explicativo lo da la IA real
   const st = (window.App && App.getState) ? App.getState() : {};
   const nodes = VLab.getNodes();
   const byAddr = m => { const x = m && m[0]; return x ? parseInt(x[1], 16) : null; };

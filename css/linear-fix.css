@@ -1,0 +1,92 @@
+/* linear-fix.css — Capa Linear: Inter, breakpoints reales y fixes responsive.
+   Se carga AL ÚLTIMO: corrige sin tocar los demás CSS. */
+
+/* ---------- Tipografía Linear ---------- */
+body, button, input, select, textarea {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'cv01', 'ss03';
+}
+code, .busmap, .scope-meta, .proto-chip, .log-console, .cat-card .addr {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.header-title { letter-spacing: -0.02em; }
+
+/* ---------- Base fluida ---------- */
+img, canvas, table { max-width: 100%; }
+main.main-container { width: 100%; box-sizing: border-box; }
+
+/* ---------- Burbuja IA: ya no estorba ---------- */
+#antopupis-widget { left: 20px; right: auto !important; z-index: 350; }
+.bee-chat-toggle { width: 52px !important; height: 52px !important; }
+
+/* ---------- Grids que colapsan bien ---------- */
+.i2c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)) !important; gap: 6px; }
+.demo-devices-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 8px; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.final-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.stability-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; }
+
+/* ---------- Tablas: scroll honesto + primera columna fija ---------- */
+.table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+.data-table, .cmp-table { min-width: 640px; }
+.data-table td:first-child, .cmp-table td:first-child { white-space: nowrap; }
+
+/* ---------- Header responsive ---------- */
+.header-content { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.header-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+
+/* ---------- Breakpoint <600px: celular pequeño ---------- */
+@media (max-width: 600px) {
+  body { font-size: 14px; }
+  .header-title { font-size: 20px; }
+  .hero-tag { font-size: 12px; }
+  .header-actions { margin-left: 0; width: 100%; }
+  .header-actions .btn { flex: 1 1 30%; justify-content: center; font-size: 12.5px; padding: 10px 4px; }
+  .card { padding: 12px; border-radius: 16px; }
+  .card-title { font-size: 15px; }
+  .dash-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-card { padding: 10px; }
+  .dash-card .v { font-size: 15px; }
+  .cat-grid { grid-template-columns: 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .demo-devices-grid { grid-template-columns: 1fr 1fr; }
+  .busmap { font-size: 11px; padding: 10px; }
+  #scopeCanvas { height: 190px; }
+  #sim3dCanvas { height: 240px; }
+  .health-num { font-size: 20px; min-width: 60px; }
+  .radio-label { display: inline-flex; align-items: center; min-height: 44px; margin: 2px 8px 2px 0; }
+  .test-options { display: flex; flex-wrap: wrap; }
+  .proto-controls .btn { flex: 1 1 45%; justify-content: center; }
+  .export-buttons .btn { flex: 1; justify-content: center; }
+  .sheet-grid { grid-template-columns: repeat(3, 1fr); }
+  /* chat como hoja inferior, sin tapar la tab bar */
+  #antopupis-widget { left: 12px; right: 12px; bottom: 84px; }
+  .bee-chat-window { width: 100% !important; max-height: 58vh; }
+  .bee-chat-window.open { width: 100% !important; }
+  #viewHeader .vh-step { display: none; }
+  #viewHeader p { display: none; }
+  .footer { padding-bottom: 96px; }
+}
+
+/* ---------- Breakpoint 600-900px: celular grande / tablet vertical ---------- */
+@media (min-width: 601px) and (max-width: 900px) {
+  .cat-grid { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: repeat(3, 1fr); }
+  #antopupis-widget { left: 14px; bottom: 88px; }
+  .header-actions { margin-left: 0; }
+}
+
+/* ---------- Breakpoint 901-1200px ---------- */
+@media (min-width: 901px) and (max-width: 1200px) {
+  body.has-nav main.main-container, body.has-nav header.header { max-width: 860px; }
+  #sideNav { width: 196px; }
+  body.has-nav { padding-left: 196px; }
+}
+
+/* ---------- Detalles Linear ---------- */
+.card { border: 1px solid rgba(255,255,255,0.08); }
+[data-theme="light"] .card { border: 1px solid #e4e7ec; }
+.btn { border-radius: 8px; }
+input[type="text"], select { border-radius: 8px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
