@@ -107,6 +107,20 @@ const LabUI = (() => {
     if (v === 'lab' && window.Sim3D) { Sim3D.init(); setTimeout(() => { try { Sim3D.rebuild(); } catch (e) {} }, 350); }
     if (v === 'signals' && window.Scope) setTimeout(() => { try { Scope.capture(); } catch (e) {} }, 150);
     if (v === 'tools' && window.Toolbox) { try { Toolbox.renderAll(); } catch (e) {} }
+    // Anti-vista-vacía: si por caché vieja no hay tarjetas de esta vista, avisar en vez de mostrar nada
+    const main = document.querySelector('main.main-container');
+    const vis = main ? main.querySelectorAll('[data-view-card]:not(.view-hidden)').length : 1;
+    let note = document.getElementById('emptyViewNote');
+    if (!vis) {
+      if (!note) {
+        note = document.createElement('div');
+        note.id = 'emptyViewNote';
+        note.className = 'card';
+        main.appendChild(note);
+      }
+      note.style.display = '';
+      note.innerHTML = '<h2 class="card-title">Vista desactualizada</h2><p style="font-size:14px">Tu navegador cargó una versión vieja de la app. Recarga sin caché: en PC <b>Ctrl+F5</b>, en celular cierra la pestaña y ábrela de nuevo. Bzzz... la miel vieja no pega.</p>';
+    } else if (note) note.style.display = 'none';
     if (window.UX) UX.refreshReveal();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
