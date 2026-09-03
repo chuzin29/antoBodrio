@@ -311,7 +311,11 @@ const LabUI = (() => {
     if (key && key !== 'TU_API_KEY_AQUI') document.getElementById('cfgKey').value = key;
     document.getElementById('btnKeySave').onclick = () => {
       const v = document.getElementById('cfgKey').value.trim();
-      if (window.APP_CONFIG) window.APP_CONFIG.GROQ_API_KEY = v || 'TU_API_KEY_AQUI';
+      try {
+        if (v) { localStorage.setItem('anto_groq_key', v); localStorage.setItem('anto_groq_model', 'openai/gpt-oss-20b'); }
+        else { localStorage.removeItem('anto_groq_key'); }
+      } catch (e) {}
+      if (window.APP_CONFIG) window.APP_CONFIG.GROQ_API_KEY = v || window.APP_CONFIG.GROQ_API_KEY;
       refreshDashboard();
     };
   }

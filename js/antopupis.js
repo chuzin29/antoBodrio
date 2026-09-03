@@ -4,7 +4,7 @@
  * Sin key hardcodeada. Modelo actualizado.
  */
 const Antopupis = (() => {
-  const MODEL = (window.APP_CONFIG && window.APP_CONFIG.GROQ_MODEL) || 'llama-3.1-8b-instant';
+  const MODEL = (window.APP_CONFIG && window.APP_CONFIG.GROQ_MODEL) || 'openai/gpt-oss-20b';
   const LEGACY_MODEL = 'llama3-8b-8192';
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
