@@ -2,12 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Antony el tonto XD — I²C Diagnostic Tool</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔌</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
 </head>
 <body>
+  <!-- BACKGROUND PARTICLES -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- FLOATING MINECRAFT BEES -->
+  <div class="floating-bee fly-1"><div class="fb-body"><div class="fb-torso"></div><div class="fb-wing-l"></div><div class="fb-wing-r"></div></div></div>
+  <div class="floating-bee fly-2"><div class="fb-body"><div class="fb-torso"></div><div class="fb-wing-l"></div><div class="fb-wing-r"></div></div></div>
+  <div class="floating-bee fly-3"><div class="fb-body"><div class="fb-torso"></div><div class="fb-wing-l"></div><div class="fb-wing-r"></div></div></div>
+
   <!-- MODE BANNER -->
   <div id="modeBanner" class="mode-banner demo-banner">
     ⚠️ MODO DEMO — DATOS SIMULADOS
@@ -18,7 +26,7 @@
     <div class="header-content">
       <div class="header-title-group">
         <h1 class="header-title">Antony el tonto XD</h1>
-        <p class="header-subtitle">Diagnóstico inteligente de dispositivos I²C</p>
+        <p class="header-subtitle">Diagnóstico inteligente de dispositivos I²C 🐝</p>
       </div>
       <div class="header-actions">
         <button id="btnConnect" class="btn btn-primary" onclick="App.connectHardware()">
@@ -223,8 +231,26 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>Antony el tonto XD — Herramienta de diagnóstico I²C | <a href="https://github.com" target="_blank">GitHub</a></p>
+    <p>Antony el tonto XD — Herramienta de diagnóstico I²C | Hecha con 🐝 por Antopupis</p>
   </footer>
+
+  <!-- BACKGROUND PARTICLES SCRIPT -->
+  <script>
+    (function(){
+      var c = document.getElementById('bgParticles');
+      for(var i=0;i<30;i++){
+        var p = document.createElement('div');
+        p.className='particle';
+        p.style.left=Math.random()*100+'%';
+        p.style.animationDuration=(8+Math.random()*12)+'s';
+        p.style.animationDelay=Math.random()*10+'s';
+        p.style.width=p.style.height=(1+Math.random()*3)+'px';
+        var colors=['#3b82f6','#a78bfa','#f472b6','#fbbf24','#22c55e'];
+        p.style.background=colors[Math.floor(Math.random()*colors.length)];
+        c.appendChild(p);
+      }
+    })();
+  </script>
 
   <!-- SCRIPTS -->
   <script src="js/serial.js"></script>
@@ -232,5 +258,6 @@
   <script src="js/diagnostics.js"></script>
   <script src="js/demo.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/antopupis.js"></script>
 </body>
 </html>
