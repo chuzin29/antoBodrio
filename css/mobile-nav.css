@@ -1,0 +1,102 @@
+/* mobile-nav.css — Navegación cómoda + diseño móvil y桌面 */
+
+/* ---------- Cabecera de vista ---------- */
+#viewHeader { margin-bottom: 14px; }
+#viewHeader .vh-inner {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 12px 16px; box-shadow: var(--shadow);
+}
+#viewHeader .vh-icon {
+  width: 44px; height: 44px; flex: none; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  box-shadow: 0 4px 14px rgba(59,130,246,.4);
+}
+#viewHeader h2 { font-size: 17px; margin: 0; }
+#viewHeader p { font-size: 12.5px; color: var(--text-secondary); margin: 1px 0 0; }
+#viewHeader .vh-step { margin-left: auto; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+/* ---------- Transición entre vistas ---------- */
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+main.view-anim [data-view-card]:not(.view-hidden) { animation: viewIn .28s ease; }
+
+/* ---------- Sidebar桌面 mejorado ---------- */
+#sideNav .nav-item { min-height: 42px; font-size: 13.5px; }
+#sideNav .nav-item.active { box-shadow: inset 3px 0 0 var(--accent); border-radius: 0 10px 10px 0; }
+#sideNav .nav-group { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); padding: 12px 10px 4px; }
+#sideNav kbd { margin-left: auto; font-size: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; color: var(--text-muted); }
+
+/* ---------- Tab bar móvil ---------- */
+#tabBar {
+  display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 300;
+  padding: 6px 4px calc(8px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+}
+#tabBar .tab-row { display: flex; }
+.tab-btn {
+  flex: 1; border: 0; background: none; cursor: pointer; color: var(--text-muted);
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 10.5px; padding: 6px 0 4px; border-radius: 10px; min-height: 52px;
+}
+.tab-btn.active { color: var(--accent); }
+.tab-btn.active svg { filter: drop-shadow(0 0 6px var(--accent-glow)); transform: translateY(-1px); }
+.tab-btn svg { transition: transform .15s ease; }
+.tab-btn:active svg { transform: scale(.88); }
+
+/* ---------- Hoja "Más" ---------- */
+#moreSheet { position: fixed; inset: 0; z-index: 400; display: none; }
+#moreSheet.open { display: block; }
+#moreSheet .sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); animation: viewIn .2s ease; }
+#moreSheet .sheet-panel {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--bg-secondary); border-top: 1px solid var(--border);
+  border-radius: 20px 20px 0 0; padding: 12px 14px calc(18px + env(safe-area-inset-bottom));
+  animation: sheetUp .28s cubic-bezier(.22,.9,.3,1);
+}
+@keyframes sheetUp { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+#moreSheet .sheet-grip { width: 40px; height: 4px; border-radius: 99px; background: var(--border-light); margin: 0 auto 10px; }
+#moreSheet .sheet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sheet-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 6px; color: var(--text-secondary); font-size: 12px; cursor: pointer; min-height: 76px;
+}
+.sheet-btn.active { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- Botones con más diseño ---------- */
+.btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); border: 0; box-shadow: 0 4px 14px rgba(59,130,246,.35); }
+.btn-primary:hover { box-shadow: 0 6px 20px rgba(59,130,246,.5); }
+.card { border-top: 2px solid transparent; }
+.card-title .card-icon { color: var(--accent); }
+
+/* ---------- Móvil ---------- */
+@media (max-width: 900px) {
+  #tabBar { display: block; }
+  body.has-nav main.main-container, body.has-nav header.header { padding-bottom: 0; }
+  body.has-nav { padding-bottom: 76px; }
+  #navToggle { display: none !important; }
+  #sideNav { display: none; }
+  #viewHeader h2 { font-size: 15px; }
+  #viewHeader p { font-size: 12px; }
+  #viewHeader .vh-icon { width: 38px; height: 38px; }
+  .btn, .icon-btn { min-height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .nav-item { min-height: 48px; }
+  .card { border-radius: 16px; margin-bottom: 12px; }
+  .dash-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dash-card .v { font-size: 17px; }
+  #scopeCanvas { height: 200px; }
+  #sim3dCanvas { height: 260px; }
+  .header-actions { gap: 6px; }
+  .header-actions .btn { padding: 10px 8px; font-size: 13px; }
+  .table-wrapper { border-radius: 12px; }
+  .proto-chip { font-size: 11px; padding: 7px 9px; }
+  .sheet-btn, .tab-btn { touch-action: manipulation; }
+}
+@media (min-width: 901px) {
+  #tabBar, #moreSheet { display: none !important; }
+}
