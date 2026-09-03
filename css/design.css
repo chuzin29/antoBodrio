@@ -177,3 +177,6 @@ table tbody tr:hover { background: rgba(91,140,255,.06); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; transition-duration: .001s !important; }
 }
+
+/* Red de seguridad: ninguna tarjeta puede quedar invisible por animaciones */
+.reveal:not(.visible) { opacity: 1 !important; transform: none !important; }

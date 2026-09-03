@@ -63,13 +63,16 @@ const Nav2 = (() => {
     document.body.appendChild(sheet);
     sheet.querySelector('.sheet-bg').onclick = closeSheet;
     sheet.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { closeSheet(); window.LabUI && LabUI.show(b.dataset.tab); });
-    // sincroniza activo observando el sidebar
+    // sincroniza activo observando el sidebar (solo re-anima si cambió la vista)
+    let lastV = '';
     const sync = () => {
       const act = document.querySelector('#sideNav .nav-item.active');
       const v = act ? act.dataset.view : 'dashboard';
       updateHeader(v);
       document.querySelectorAll('#tabBar .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === v));
       document.querySelectorAll('#moreSheet .sheet-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === v));
+      if (v === lastV) return;
+      lastV = v;
       const m = document.querySelector('main.main-container');
       if (m) { m.classList.remove('view-anim'); void m.offsetWidth; m.classList.add('view-anim'); }
     };

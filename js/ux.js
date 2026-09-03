@@ -34,27 +34,15 @@ const UX = (() => {
   }
 
   /* ---------- Reveal on scroll ---------- */
+  // NOTA: el reveal por observer dejaba tarjetas en opacity:0 (no aparecían
+  // o se cortaba la animación al cambiar de vista). Se desactiva: todo visible.
   let observer = null;
   function initReveal() {
-    const cards = document.querySelectorAll('main .card');
-    cards.forEach((c, i) => {
-      c.classList.add('reveal', 'reveal-d' + ((i % 4) + 1));
-    });
-    if (reduceMotion || !('IntersectionObserver' in window)) {
-      cards.forEach(c => c.classList.add('visible'));
-      return;
-    }
-    observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-      });
-    }, { threshold: 0.08 });
-    cards.forEach(c => observer.observe(c));
+    document.querySelectorAll('main .card').forEach(c => c.classList.add('visible'));
   }
   function refreshReveal() {
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
-      if (observer) observer.observe(el); else el.classList.add('visible');
-    });
+    document.querySelectorAll('main .card.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+    if (observer) { try { observer.disconnect(); } catch (e) {} observer = null; }
   }
 
   /* ---------- Ripple ---------- */
