@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Antony el tonto XD — I²C Diagnostic Tool</title>
+  <title>Antony el tonto XD — I2C Diagnostic Tool</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='17' rx='8' ry='7' fill='%23F5C518' stroke='%238B6914' stroke-width='1.5'/><rect x='12' y='15' width='8' height='2' rx='1' fill='%231a1a1a'/></svg>">
 </head>
 <body>
   <!-- BACKGROUND PARTICLES -->
@@ -17,35 +17,134 @@
   <div class="floating-bee fly-3"><div class="fb-body"><div class="fb-torso"></div><div class="fb-wing-l"></div><div class="fb-wing-r"></div></div></div>
 
   <!-- MODE BANNER -->
-  <div id="modeBanner" class="mode-banner demo-banner">
-    ⚠️ MODO DEMO — DATOS SIMULADOS
-  </div>
+  <div id="modeBanner" class="mode-banner" style="display:none;"></div>
 
   <!-- HEADER -->
   <header class="header">
     <div class="header-content">
       <div class="header-title-group">
         <h1 class="header-title">Antony el tonto XD</h1>
-        <p class="header-subtitle">Diagnóstico inteligente de dispositivos I²C 🐝</p>
+        <p class="header-subtitle">Diagnostico inteligente de dispositivos I2C</p>
       </div>
       <div class="header-actions">
         <button id="btnConnect" class="btn btn-primary" onclick="App.connectHardware()">
-          <span class="btn-icon">🔌</span> Conectar dispositivo
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
+          Conectar
         </button>
         <button id="btnDemo" class="btn btn-secondary" onclick="App.startDemo()">
-          <span class="btn-icon">🎮</span> Modo Demo
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          Modo Demo
         </button>
-        <button id="btnStopDemo" class="btn btn-secondary" onclick="App.stopDemo()" style="display:none; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border-color:#ef4444;">
-          <span class="btn-icon">⏹</span> Salir del Demo
+        <button id="btnStopDemo" class="btn btn-danger" onclick="App.stopDemo()" style="display:none;">
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          Salir Demo
         </button>
       </div>
     </div>
   </header>
 
+  <!-- DEMO DEVICE SELECTOR -->
+  <div id="demoSelector" class="demo-selector" style="display:none;">
+    <div class="demo-selector-inner">
+      <div class="demo-selector-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        Selecciona dispositivos para simular
+      </div>
+      <div class="demo-devices-grid">
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x27" checked>
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+            </div>
+            <span class="demo-device-addr">0x27</span>
+            <span class="demo-device-name">PCF8574A</span>
+            <span class="demo-device-type">LCD / IO Expander</span>
+          </div>
+        </label>
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x3C" checked>
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h10M12 7v10"/></svg>
+            </div>
+            <span class="demo-device-addr">0x3C</span>
+            <span class="demo-device-name">SSD1306</span>
+            <span class="demo-device-type">OLED 128x64</span>
+          </div>
+        </label>
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x68" checked>
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <span class="demo-device-addr">0x68</span>
+            <span class="demo-device-name">DS3231</span>
+            <span class="demo-device-type">Reloj RTC</span>
+          </div>
+        </label>
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x50" checked>
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
+            </div>
+            <span class="demo-device-addr">0x50</span>
+            <span class="demo-device-name">AT24C32</span>
+            <span class="demo-device-type">EEPROM</span>
+          </div>
+        </label>
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x76" checked>
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
+            </div>
+            <span class="demo-device-addr">0x76</span>
+            <span class="demo-device-name">BME280</span>
+            <span class="demo-device-type">Sensor Climatico</span>
+          </div>
+        </label>
+        <label class="demo-device-check">
+          <input type="checkbox" value="0x48">
+          <div class="demo-device-card">
+            <div class="demo-device-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <span class="demo-device-addr">0x48</span>
+            <span class="demo-device-name">ADS1115</span>
+            <span class="demo-device-type">ADC 16-bit</span>
+          </div>
+        </label>
+      </div>
+      <div class="demo-fault-options">
+        <div class="demo-fault-title">Simular defectos:</div>
+        <label class="demo-device-check fault-check">
+          <input type="checkbox" id="simColdSolder" value="coldSolder">
+          <div class="demo-device-card fault-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Soldadura Fria</span>
+          </div>
+        </label>
+        <label class="demo-device-check fault-check">
+          <input type="checkbox" id="simIntermittent" value="intermittent">
+          <div class="demo-device-card fault-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>Intermitencia</span>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
   <main class="main-container">
     <!-- CONNECTION STATUS -->
     <section class="card status-card">
-      <h2 class="card-title"><span class="card-icon">📡</span> Estado de Conexión</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+        Estado de Conexion
+      </h2>
       <div class="status-grid">
         <div class="status-item">
           <span class="status-dot" id="dotHardware"></span>
@@ -55,7 +154,7 @@
         <div class="status-item">
           <span class="status-dot" id="dotPort"></span>
           <span class="status-label">Puerto</span>
-          <span class="status-value" id="statusPort">—</span>
+          <span class="status-value" id="statusPort">--</span>
         </div>
         <div class="status-item">
           <span class="status-dot" id="dotBridge"></span>
@@ -64,12 +163,12 @@
         </div>
         <div class="status-item">
           <span class="status-dot" id="dotSpeed"></span>
-          <span class="status-label">Velocidad I²C</span>
-          <span class="status-value" id="statusSpeed">—</span>
+          <span class="status-label">Velocidad I2C</span>
+          <span class="status-value" id="statusSpeed">--</span>
         </div>
         <div class="status-item">
           <span class="status-dot" id="dotBus"></span>
-          <span class="status-label">Bus I²C</span>
+          <span class="status-label">Bus I2C</span>
           <span class="status-value" id="statusBus">Inactivo</span>
         </div>
       </div>
@@ -77,10 +176,14 @@
 
     <!-- I2C SCANNER -->
     <section class="card scanner-card">
-      <h2 class="card-title"><span class="card-icon">🔍</span> Escáner I²C</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Escaner I2C
+      </h2>
       <div class="scanner-controls">
         <button id="btnScan" class="btn btn-primary" onclick="App.scanBus()" disabled>
-          <span class="btn-icon">📡</span> Escanear bus
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Escanear bus
         </button>
         <div class="scan-result" id="scanResult"></div>
       </div>
@@ -89,19 +192,22 @@
 
     <!-- DETECTED DEVICES -->
     <section class="card devices-card">
-      <h2 class="card-title"><span class="card-icon">📋</span> Dispositivos Detectados</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        Dispositivos Detectados
+      </h2>
       <div class="table-wrapper">
         <table class="data-table" id="devicesTable">
           <thead>
             <tr>
-              <th>Dirección</th>
+              <th>Direccion</th>
               <th>Estado</th>
               <th>Respuestas</th>
               <th>Errores</th>
               <th>NACK</th>
               <th>Timeout</th>
               <th>Estabilidad</th>
-              <th>Diagnóstico</th>
+              <th>Diagnostico</th>
             </tr>
           </thead>
           <tbody id="devicesBody">
@@ -113,30 +219,24 @@
 
     <!-- STABILITY TEST -->
     <section class="card stability-card">
-      <h2 class="card-title"><span class="card-icon">🔬</span> Prueba de Estabilidad</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Prueba de Estabilidad
+      </h2>
       <div class="stability-controls">
         <div class="test-options">
-          <label class="radio-label">
-            <input type="radio" name="testCount" value="10"> 10 pruebas
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="testCount" value="50" checked> 50 pruebas
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="testCount" value="100"> 100 pruebas
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="testCount" value="500"> 500 pruebas
-          </label>
+          <label class="radio-label"><input type="radio" name="testCount" value="10"> 10 pruebas</label>
+          <label class="radio-label"><input type="radio" name="testCount" value="50" checked> 50 pruebas</label>
+          <label class="radio-label"><input type="radio" name="testCount" value="100"> 100 pruebas</label>
+          <label class="radio-label"><input type="radio" name="testCount" value="500"> 500 pruebas</label>
         </div>
         <button id="btnStability" class="btn btn-primary" onclick="App.startStabilityTest()" disabled>
-          <span class="btn-icon">🧪</span> Iniciar prueba
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+          Iniciar prueba
         </button>
       </div>
       <div class="progress-container" id="progressContainer" style="display:none;">
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <span class="progress-text" id="progressText">0%</span>
       </div>
       <div class="stability-results" id="stabilityResults"></div>
@@ -144,38 +244,44 @@
 
     <!-- DIAGNOSIS -->
     <section class="card diagnosis-card">
-      <h2 class="card-title"><span class="card-icon">🩺</span> Diagnóstico</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Diagnostico
+      </h2>
       <div id="diagnosisResults" class="diagnosis-results">
-        <p class="empty-text">Ejecuta una prueba de estabilidad para ver el diagnóstico.</p>
+        <p class="empty-text">Ejecuta una prueba de estabilidad para ver el diagnostico.</p>
       </div>
       <div class="warning-box" id="warningBox" style="display:none;">
-        <span class="warning-icon">⚠️</span>
-        <p>Una posible soldadura fría <strong>no puede confirmarse</strong> únicamente mediante software. Los resultados indican un comportamiento eléctrico/intermitente compatible con una conexión defectuosa y debe verificarse físicamente.</p>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p>Una posible soldadura fria <strong>no puede confirmarse</strong> unicamente mediante software. Los resultados indican un comportamiento electrico/intermitente compatible con una conexion defectuosa y debe verificarse fisicamente.</p>
       </div>
     </section>
 
     <!-- MASTER / SLAVE -->
     <section class="card roles-card">
-      <h2 class="card-title"><span class="card-icon">🏛️</span> Master / Slave</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        Master / Slave
+      </h2>
       <div class="roles-grid">
         <div class="role-box master-box">
           <h3>MASTER (Controlador)</h3>
           <div class="role-content" id="masterInfo">
-            <p class="role-desc">El microcontrolador (Arduino/ESP32) actúa como <strong>MASTER</strong> durante las pruebas, iniciando la comunicación en el bus I²C.</p>
+            <p class="role-desc">El microcontrolador (Arduino/ESP32) actua como <strong>MASTER</strong> durante las pruebas, iniciando la comunicacion en el bus I2C.</p>
             <div class="role-detail">
               <span class="role-label">Dispositivo:</span>
               <span class="role-value" id="masterDevice">No conectado</span>
             </div>
             <div class="role-detail">
-              <span class="role-label">Función:</span>
-              <span class="role-value">Escaneo y diagnóstico</span>
+              <span class="role-label">Funcion:</span>
+              <span class="role-value">Escaneo y diagnostico</span>
             </div>
           </div>
         </div>
         <div class="role-box slave-box">
           <h3>SLAVE / TARGET (Dispositivos)</h3>
           <div class="role-content" id="slaveInfo">
-            <p class="role-desc">Los dispositivos que responden en el bus I²C son <strong>SLAVE/TARGET</strong>. El microcontrolador los interroga y ellos responden.</p>
+            <p class="role-desc">Los dispositivos que responden en el bus I2C son <strong>SLAVE/TARGET</strong>. El microcontrolador los interroga y ellos responden.</p>
             <div class="slave-list" id="slaveList">
               <p class="empty-text">No hay dispositivos detectados.</p>
             </div>
@@ -184,71 +290,111 @@
       </div>
     </section>
 
+    <!-- 3D BUS VISUALIZATION (Demo only) -->
+    <section class="card bus3d-card" id="bus3dCard" style="display:none;">
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Simulacion del Bus I2C
+      </h2>
+      <div class="bus3d-scene" id="bus3dScene">
+        <div class="bus3d-container">
+          <div class="bus3d-board">
+            <div class="bus3d-master" id="bus3dMaster">
+              <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                <rect x="4" y="8" width="40" height="32" rx="4" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2"/>
+                <rect x="10" y="14" width="8" height="6" rx="1" fill="#3b82f6" opacity="0.6"/>
+                <rect x="22" y="14" width="8" height="6" rx="1" fill="#3b82f6" opacity="0.6"/>
+                <rect x="10" y="24" width="28" height="3" rx="1" fill="#60a5fa" opacity="0.4"/>
+                <circle cx="38" cy="14" r="3" fill="#22c55e"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/></circle>
+                <text x="24" y="40" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="monospace">MASTER</text>
+              </svg>
+            </div>
+            <div class="bus3d-wire">
+              <div class="bus3d-sda-line">
+                <div class="bus3d-pulse" id="pulseSDA"></div>
+                <span>SDA</span>
+              </div>
+              <div class="bus3d-scl-line">
+                <div class="bus3d-pulse" id="pulseSCL"></div>
+                <span>SCL</span>
+              </div>
+            </div>
+            <div class="bus3d-slaves" id="bus3dSlaves"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- EVENT LOG -->
     <section class="card log-card">
-      <h2 class="card-title"><span class="card-icon">📝</span> Registro de Eventos</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Registro de Eventos
+      </h2>
       <div class="log-controls">
-        <button class="btn btn-small" onclick="App.clearLog()">🗑️ Limpiar</button>
-        <button class="btn btn-small" onclick="App.exportLog()">📋 Copiar log</button>
+        <button class="btn btn-small" onclick="App.clearLog()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Limpiar
+        </button>
+        <button class="btn btn-small" onclick="App.exportLog()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
       </div>
       <div class="log-console" id="logConsole"></div>
     </section>
 
     <!-- FINAL RESULT -->
     <section class="card final-card">
-      <h2 class="card-title"><span class="card-icon">📊</span> Resultado Final</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Resultado Final
+      </h2>
       <div class="final-grid" id="finalResults">
-        <div class="final-item">
-          <span class="final-number" id="finalTotal">0</span>
-          <span class="final-label">Dispositivos encontrados</span>
-        </div>
-        <div class="final-item stable">
-          <span class="final-number" id="finalStable">0</span>
-          <span class="final-label">Estables</span>
-        </div>
-        <div class="final-item suspicious">
-          <span class="final-number" id="finalSuspicious">0</span>
-          <span class="final-label">Sospechosos</span>
-        </div>
-        <div class="final-item danger">
-          <span class="final-number" id="finalDanger">0</span>
-          <span class="final-label">Posible falla</span>
-        </div>
+        <div class="final-item"><span class="final-number" id="finalTotal">0</span><span class="final-label">Dispositivos</span></div>
+        <div class="final-item stable"><span class="final-number" id="finalStable">0</span><span class="final-label">Estables</span></div>
+        <div class="final-item suspicious"><span class="final-number" id="finalSuspicious">0</span><span class="final-label">Sospechosos</span></div>
+        <div class="final-item danger"><span class="final-number" id="finalDanger">0</span><span class="final-label">Posible falla</span></div>
       </div>
       <div class="final-explanation" id="finalExplanation"></div>
     </section>
 
     <!-- EXPORT -->
     <section class="card export-card">
-      <h2 class="card-title"><span class="card-icon">💾</span> Exportar Diagnóstico</h2>
+      <h2 class="card-title">
+        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar Diagnostico
+      </h2>
       <div class="export-buttons">
         <button class="btn btn-primary" onclick="App.exportJSON()">
-          <span class="btn-icon">📄</span> Exportar JSON
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          JSON
         </button>
         <button class="btn btn-secondary" onclick="App.exportCSV()">
-          <span class="btn-icon">📊</span> Exportar CSV
+          <svg class="btn-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          CSV
         </button>
       </div>
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
-    <p>Antony el tonto XD — Herramienta de diagnóstico I²C | Hecha con 🐝 por Antopupis</p>
+    <p>Antony el tonto XD — Herramienta de diagnostico I2C</p>
   </footer>
 
-  <!-- BACKGROUND PARTICLES SCRIPT -->
+  <!-- BACKGROUND PARTICLES -->
   <script>
     (function(){
       var c = document.getElementById('bgParticles');
-      for(var i=0;i<30;i++){
+      var colors=['#3b82f6','#a78bfa','#f472b6','#fbbf24','#22c55e'];
+      for(var i=0;i<25;i++){
         var p = document.createElement('div');
         p.className='particle';
         p.style.left=Math.random()*100+'%';
-        p.style.animationDuration=(8+Math.random()*12)+'s';
-        p.style.animationDelay=Math.random()*10+'s';
-        p.style.width=p.style.height=(1+Math.random()*3)+'px';
-        var colors=['#3b82f6','#a78bfa','#f472b6','#fbbf24','#22c55e'];
+        p.style.animationDuration=(10+Math.random()*15)+'s';
+        p.style.animationDelay=Math.random()*12+'s';
+        var s=(1+Math.random()*2)+'px';
+        p.style.width=s;p.style.height=s;
         p.style.background=colors[Math.floor(Math.random()*colors.length)];
         c.appendChild(p);
       }

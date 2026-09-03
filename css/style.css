@@ -2099,3 +2099,375 @@ body {
 @media (max-width: 768px) {
   .floating-bee { display: none; }
 }
+
+/* ============================================
+   DEMO DEVICE SELECTOR
+   ============================================ */
+.demo-selector {
+  background: linear-gradient(135deg, #111827, #1a2235);
+  border-bottom: 2px solid #fbbf24;
+  padding: 16px 20px;
+  position: relative;
+  z-index: 90;
+}
+
+.demo-selector-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.demo-selector-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fbbf24;
+  margin-bottom: 14px;
+}
+
+.demo-devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.demo-device-check {
+  cursor: pointer;
+}
+
+.demo-device-check input {
+  display: none;
+}
+
+.demo-device-card {
+  padding: 12px;
+  background: #0a0e17;
+  border: 2px solid #2a3550;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.demo-device-check input:checked + .demo-device-card {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.02));
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.demo-device-card:hover {
+  border-color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.demo-device-icon {
+  margin-bottom: 2px;
+}
+
+.demo-device-addr {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.demo-device-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.demo-device-type {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.fault-check .demo-device-card {
+  flex-direction: row;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.fault-card {
+  border-color: #374158 !important;
+}
+
+.demo-device-check input:checked + .fault-card {
+  border-color: #eab308 !important;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(234, 179, 8, 0.02)) !important;
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.2) !important;
+}
+
+.demo-fault-options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.demo-fault-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .demo-devices-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================
+   3D BUS VISUALIZATION
+   ============================================ */
+.bus3d-card {
+  overflow: hidden;
+}
+
+.bus3d-scene {
+  width: 100%;
+  overflow-x: auto;
+  padding: 20px 0;
+}
+
+.bus3d-container {
+  min-width: 600px;
+  padding: 0 20px;
+}
+
+.bus3d-board {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  perspective: 800px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #0c1525, #111d35);
+  border-radius: 12px;
+  border: 1px solid #1e3a5f;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(8deg);
+}
+
+.bus3d-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.08), transparent 70%);
+  border-radius: 12px;
+}
+
+.bus3d-master {
+  flex-shrink: 0;
+  padding: 12px;
+  background: linear-gradient(135deg, #0f1b2d, #162040);
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.05);
+  position: relative;
+  z-index: 2;
+  transform: translateZ(20px);
+}
+
+.bus3d-wire {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 8px;
+  min-width: 200px;
+}
+
+.bus3d-sda-line,
+.bus3d-scl-line {
+  height: 6px;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bus3d-sda-line {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.bus3d-scl-line {
+  background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+
+.bus3d-sda-line span,
+.bus3d-scl-line span {
+  position: absolute;
+  right: -4px;
+  top: -18px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.bus3d-sda-line span { color: #60a5fa; }
+.bus3d-scl-line span { color: #4ade80; }
+
+.bus3d-pulse {
+  position: absolute;
+  width: 30px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  border-radius: 3px;
+  left: -30px;
+  animation: wirePulse 1.5s ease-in-out infinite;
+}
+
+.bus3d-scl-line .bus3d-pulse {
+  animation-delay: 0.3s;
+  animation-duration: 1.2s;
+}
+
+@keyframes wirePulse {
+  0% { left: -30px; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: calc(100% + 30px); opacity: 0; }
+}
+
+.bus3d-slaves {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.bus3d-slave {
+  flex-shrink: 0;
+  padding: 10px;
+  background: linear-gradient(135deg, #0f1b2d, #162040);
+  border: 2px solid #374158;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 80px;
+  transform: translateZ(10px);
+  transition: all 0.5s ease;
+  position: relative;
+}
+
+.bus3d-slave.active {
+  border-color: #22c55e;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+}
+
+.bus3d-slave.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+  animation: slaveError 0.5s ease;
+}
+
+@keyframes slaveError {
+  0%, 100% { transform: translateZ(10px) translateX(0); }
+  25% { transform: translateZ(10px) translateX(-3px); }
+  75% { transform: translateZ(10px) translateX(3px); }
+}
+
+.bus3d-slave-addr {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.bus3d-slave-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.bus3d-slave-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #374158;
+  margin: 6px auto 0;
+  transition: all 0.3s;
+}
+
+.bus3d-slave.active .bus3d-slave-led {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.bus3d-slave.error .bus3d-slave-led {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.bus3d-slave-activity {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fbbf24;
+  display: none;
+  animation: activityBlink 0.3s ease infinite alternate;
+}
+
+.bus3d-slave.active .bus3d-slave-activity {
+  display: block;
+}
+
+@keyframes activityBlink {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ============================================
+   BUTTON DANGER
+   ============================================ */
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-svg {
+  flex-shrink: 0;
+}
+
+/* ============================================
+   MOBILE 3D BUS
+   ============================================ */
+@media (max-width: 768px) {
+  .bus3d-board {
+    transform: rotateX(4deg);
+    padding: 20px 10px;
+  }
+
+  .bus3d-master svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .bus3d-slaves {
+    gap: 6px;
+  }
+
+  .bus3d-slave {
+    padding: 8px 6px;
+    min-width: 60px;
+  }
+
+  .bus3d-slave-addr {
+    font-size: 0.7rem;
+  }
+}
