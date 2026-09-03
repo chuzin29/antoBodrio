@@ -1,0 +1,130 @@
+/* ============================================================
+   enhancements.css — Mejoras UX premium (Apple-subtle)
+   Se carga DESPUÉS de style.css. No toca style.css.
+   ============================================================ */
+
+/* ---------- 1. Light theme ---------- */
+[data-theme="light"] {
+  --bg-primary: #f4f6fb;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f4ff;
+  --text-primary: #101828;
+  --text-secondary: #475467;
+  --text-muted: #98a2b3;
+  --border: #e4e7ec;
+  --border-light: #d0d5dd;
+  --shadow: 0 4px 24px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 8px 40px rgba(16, 24, 40, 0.12);
+  --accent-glow: rgba(59, 130, 246, 0.15);
+}
+[data-theme="light"] .log-console { background: #0a0e17; }
+[data-theme="light"] .floating-bee { opacity: .7; }
+
+/* ---------- 2. Scroll reveal ---------- */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1); }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-d1 { transition-delay: .06s; } .reveal-d2 { transition-delay: .12s; }
+.reveal-d3 { transition-delay: .18s; } .reveal-d4 { transition-delay: .24s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- 3. Canvas fondo ---------- */
+#bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .55; }
+.bg-particles { opacity: .35; }
+main, header, footer { position: relative; z-index: 1; }
+
+/* ---------- 4. Ripple + micro-interacciones ---------- */
+.btn { position: relative; overflow: hidden; transition: transform .15s ease, box-shadow .2s ease, background .2s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.98); }
+.btn .ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255,255,255,.45); animation: ripple .55s ease-out forwards; pointer-events: none; }
+@keyframes ripple { to { transform: scale(4); opacity: 0; } }
+.card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.i2c-cell { transition: transform .15s ease, background .2s ease, box-shadow .2s ease; }
+.i2c-cell:hover { transform: scale(1.12); z-index: 2; }
+.i2c-cell.found { animation: cellPop .45s cubic-bezier(.34,1.56,.64,1); }
+@keyframes cellPop { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.demo-device-card { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.demo-device-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+/* ---------- 5. Tooltips CSS-only ---------- */
+[data-tip] { position: relative; }
+[data-tip]:hover::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%) translateY(4px); background: #0b1220; color: #e8eaf0;
+  border: 1px solid var(--border); font-size: 12px; font-weight: 400; line-height: 1.4;
+  padding: 6px 10px; border-radius: 8px; white-space: nowrap; z-index: 100;
+  opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+  box-shadow: var(--shadow-lg); max-width: 240px; white-space: normal; width: max-content;
+}
+[data-tip]:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 6. Skeleton / shimmer ---------- */
+.skeleton-row td > span, .skel {
+  display: block; height: 14px; border-radius: 6px;
+  background: linear-gradient(90deg, var(--border) 25%, var(--border-light) 50%, var(--border) 75%);
+  background-size: 200% 100%; animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+.btn.loading { pointer-events: none; opacity: .75; }
+.btn.loading::after {
+  content: ""; width: 14px; height: 14px; border-radius: 50%; flex: none;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+  animation: spin .7s linear infinite; margin-left: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- 7. Header toggles ---------- */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary);
+  transition: var(--transition);
+}
+.icon-btn:hover { color: var(--text-primary); border-color: var(--border-light); transform: translateY(-1px); }
+.icon-btn.active { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- 8. Dashboard charts ---------- */
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.chart-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; min-height: 220px; }
+.chart-box h4 { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
+.chart-box canvas { width: 100% !important; max-height: 220px; }
+@media (max-width: 720px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+/* ---------- 9. Chat fluido ---------- */
+.bee-chat-window { transform-origin: bottom right; transition: transform .32s cubic-bezier(.34,1.4,.64,1), opacity .22s ease; }
+.bee-chat-window:not(.open) { transform: scale(.7) translateY(16px); opacity: 0; pointer-events: none; }
+.bee-msg { animation: msgIn .3s cubic-bezier(.22,.9,.3,1.2); }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+.bee-mode { font-size: 11px; padding: 2px 8px; border-radius: 99px; margin-left: 8px; }
+.bee-mode.cloud { background: rgba(34,197,94,.15); color: #4ade80; }
+.bee-mode.local { background: rgba(234,179,8,.15); color: #facc15; }
+.bee-suggest { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.bee-suggest button {
+  font-size: 12px; padding: 4px 10px; border-radius: 99px; cursor: pointer;
+  background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary);
+}
+.bee-suggest button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- 10. Bus 3D tilt ---------- */
+.bus3d-scene { perspective: 1200px; }
+.bus3d-container { transition: transform .2s ease-out; transform-style: preserve-3d; will-change: transform; }
+.bus3d-slave { transition: transform .2s ease, box-shadow .2s ease; }
+.bus3d-slave:hover { transform: translateZ(24px) scale(1.05); }
+
+/* ---------- 11. Mobile ---------- */
+@media (max-width: 720px) {
+  .status-grid { grid-template-columns: 1fr 1fr; }
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .header-content { flex-direction: column; align-items: stretch; }
+  .header-actions .btn { flex: 1; justify-content: center; }
+  .bee-chat-window.open { width: calc(100vw - 24px); right: 12px; }
+}
+
+/* ---------- 12. Final numbers count-up ---------- */
+.final-number { font-variant-numeric: tabular-nums; }

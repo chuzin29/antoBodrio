@@ -158,10 +158,17 @@ const App = (function() {
   }
 
   function updateFinalResults(summary) {
-    document.getElementById('finalTotal').textContent = summary.total;
-    document.getElementById('finalStable').textContent = summary.stable;
-    document.getElementById('finalSuspicious').textContent = summary.suspicious;
-    document.getElementById('finalDanger').textContent = summary.danger;
+    if (window.UX) {
+      UX.countUp(document.getElementById('finalTotal'), summary.total);
+      UX.countUp(document.getElementById('finalStable'), summary.stable);
+      UX.countUp(document.getElementById('finalSuspicious'), summary.suspicious);
+      UX.countUp(document.getElementById('finalDanger'), summary.danger);
+    } else {
+      document.getElementById('finalTotal').textContent = summary.total;
+      document.getElementById('finalStable').textContent = summary.stable;
+      document.getElementById('finalSuspicious').textContent = summary.suspicious;
+      document.getElementById('finalDanger').textContent = summary.danger;
+    }
     document.getElementById('finalExplanation').textContent = summary.explanation;
   }
 
@@ -291,6 +298,7 @@ const App = (function() {
   function scanBus() {
     resetGrid();
     detectedDevices = [];
+    if (window.UX) { UX.showSkeleton(3); UX.setLoading('btnScan', true); UX.sfx.scan(); }
     logEvent('Escaneo del bus I2C iniciado...', 'info');
 
     var promise;
@@ -301,8 +309,10 @@ const App = (function() {
     }
 
     promise.then(function(result) {
+      if (window.UX) UX.setLoading('btnScan', false);
       if (!result.success) {
         logEvent('Error en escaneo: ' + (result.error || 'Sin respuesta'), 'error');
+        if (window.UX) UX.sfx.error();
         return;
       }
       lastScanResult = result;
@@ -318,6 +328,7 @@ const App = (function() {
 
       if (isDemo) showBus3D();
       document.getElementById('btnStability').disabled = detectedDevices.length === 0;
+      if (window.UX) { UX.sfx.found(); UX.refreshReveal(); }
       logEvent('Escaneo completado: ' + result.devices.length + ' dispositivos', 'success');
     });
   }
@@ -356,6 +367,7 @@ const App = (function() {
       updateStabilityResults(results);
       updateDiagnosis(results);
       updateFinalResults(results.summary);
+      if (window.UX) { UX.renderDashboard(results); UX.sfx.done(); UX.refreshReveal(); }
       document.getElementById('btnStability').disabled = false;
       document.getElementById('btnScan').disabled = false;
       logEvent('Prueba completada', 'success');

@@ -116,10 +116,10 @@ const Diagnostics = (() => {
 
   function getStatusLabel(status) {
     switch (status) {
-      case 'stable': return '🟢 ESTABLE';
-      case 'suspicious': return '🟡 SOSPECHOSO';
-      case 'danger': return '🔴 POSIBLE FALLA';
-      default: return '❓ DESCONOCIDO';
+      case 'stable': return 'ESTABLE';
+      case 'suspicious': return 'SOSPECHOSO';
+      case 'danger': return 'POSIBLE FALLA';
+      default: return 'DESCONOCIDO';
     }
   }
 
