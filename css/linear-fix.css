@@ -90,3 +90,21 @@ main.main-container { width: 100%; box-sizing: border-box; }
 .btn { border-radius: 8px; }
 input[type="text"], select { border-radius: 8px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ===== Chat Antopupis: anclaje correcto (el widget vive abajo-izquierda) ===== */
+#antopupis-widget { left: 20px; right: auto !important; bottom: 20px; z-index: 350; }
+.bee-chat-window {
+  left: 0 !important; right: auto !important; bottom: 66px !important; top: auto !important;
+  width: min(380px, calc(100vw - 40px)) !important;
+  height: min(540px, calc(100dvh - 170px)) !important;
+  max-height: calc(100dvh - 170px);
+  display: flex; flex-direction: column;
+  transform-origin: bottom left !important;
+}
+.bee-chat-messages { flex: 1 1 auto; min-height: 0; }
+.bee-chat-input-area { flex: none; }
+.bee-chat-window.open { transform: translateY(0) scale(1) !important; }
+@media (max-width: 900px) {
+  #antopupis-widget { left: 12px !important; right: auto !important; bottom: 88px !important; }
+  .bee-chat-window { width: calc(100vw - 24px) !important; height: min(520px, calc(100dvh - 200px)) !important; }
+}
