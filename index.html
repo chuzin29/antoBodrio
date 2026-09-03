@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antony el tonto XD — I²C Diagnostic Tool</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔌</text></svg>">
+</head>
+<body>
+  <!-- MODE BANNER -->
+  <div id="modeBanner" class="mode-banner demo-banner">
+    ⚠️ MODO DEMO — DATOS SIMULADOS
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-title-group">
+        <h1 class="header-title">Antony el tonto XD</h1>
+        <p class="header-subtitle">Diagnóstico inteligente de dispositivos I²C</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnConnect" class="btn btn-primary" onclick="App.connectHardware()">
+          <span class="btn-icon">🔌</span> Conectar dispositivo
+        </button>
+        <button id="btnDemo" class="btn btn-secondary" onclick="App.startDemo()">
+          <span class="btn-icon">🎮</span> Modo Demo
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- CONNECTION STATUS -->
+    <section class="card status-card">
+      <h2 class="card-title"><span class="card-icon">📡</span> Estado de Conexión</h2>
+      <div class="status-grid">
+        <div class="status-item">
+          <span class="status-dot" id="dotHardware"></span>
+          <span class="status-label">Hardware</span>
+          <span class="status-value" id="statusHardware">No conectado</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot" id="dotPort"></span>
+          <span class="status-label">Puerto</span>
+          <span class="status-value" id="statusPort">—</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot" id="dotBridge"></span>
+          <span class="status-label">Bridge</span>
+          <span class="status-value" id="statusBridge">Inactivo</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot" id="dotSpeed"></span>
+          <span class="status-label">Velocidad I²C</span>
+          <span class="status-value" id="statusSpeed">—</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot" id="dotBus"></span>
+          <span class="status-label">Bus I²C</span>
+          <span class="status-value" id="statusBus">Inactivo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- I2C SCANNER -->
+    <section class="card scanner-card">
+      <h2 class="card-title"><span class="card-icon">🔍</span> Escáner I²C</h2>
+      <div class="scanner-controls">
+        <button id="btnScan" class="btn btn-primary" onclick="App.scanBus()" disabled>
+          <span class="btn-icon">📡</span> Escanear bus
+        </button>
+        <div class="scan-result" id="scanResult"></div>
+      </div>
+      <div class="i2c-grid" id="i2cGrid"></div>
+    </section>
+
+    <!-- DETECTED DEVICES -->
+    <section class="card devices-card">
+      <h2 class="card-title"><span class="card-icon">📋</span> Dispositivos Detectados</h2>
+      <div class="table-wrapper">
+        <table class="data-table" id="devicesTable">
+          <thead>
+            <tr>
+              <th>Dirección</th>
+              <th>Estado</th>
+              <th>Respuestas</th>
+              <th>Errores</th>
+              <th>NACK</th>
+              <th>Timeout</th>
+              <th>Estabilidad</th>
+              <th>Diagnóstico</th>
+            </tr>
+          </thead>
+          <tbody id="devicesBody">
+            <tr class="empty-row"><td colspan="8">No hay dispositivos detectados</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STABILITY TEST -->
+    <section class="card stability-card">
+      <h2 class="card-title"><span class="card-icon">🔬</span> Prueba de Estabilidad</h2>
+      <div class="stability-controls">
+        <div class="test-options">
+          <label class="radio-label">
+            <input type="radio" name="testCount" value="10"> 10 pruebas
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="testCount" value="50" checked> 50 pruebas
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="testCount" value="100"> 100 pruebas
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="testCount" value="500"> 500 pruebas
+          </label>
+        </div>
+        <button id="btnStability" class="btn btn-primary" onclick="App.startStabilityTest()" disabled>
+          <span class="btn-icon">🧪</span> Iniciar prueba
+        </button>
+      </div>
+      <div class="progress-container" id="progressContainer" style="display:none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-text" id="progressText">0%</span>
+      </div>
+      <div class="stability-results" id="stabilityResults"></div>
+    </section>
+
+    <!-- DIAGNOSIS -->
+    <section class="card diagnosis-card">
+      <h2 class="card-title"><span class="card-icon">🩺</span> Diagnóstico</h2>
+      <div id="diagnosisResults" class="diagnosis-results">
+        <p class="empty-text">Ejecuta una prueba de estabilidad para ver el diagnóstico.</p>
+      </div>
+      <div class="warning-box" id="warningBox" style="display:none;">
+        <span class="warning-icon">⚠️</span>
+        <p>Una posible soldadura fría <strong>no puede confirmarse</strong> únicamente mediante software. Los resultados indican un comportamiento eléctrico/intermitente compatible con una conexión defectuosa y debe verificarse físicamente.</p>
+      </div>
+    </section>
+
+    <!-- MASTER / SLAVE -->
+    <section class="card roles-card">
+      <h2 class="card-title"><span class="card-icon">🏛️</span> Master / Slave</h2>
+      <div class="roles-grid">
+        <div class="role-box master-box">
+          <h3>MASTER (Controlador)</h3>
+          <div class="role-content" id="masterInfo">
+            <p class="role-desc">El microcontrolador (Arduino/ESP32) actúa como <strong>MASTER</strong> durante las pruebas, iniciando la comunicación en el bus I²C.</p>
+            <div class="role-detail">
+              <span class="role-label">Dispositivo:</span>
+              <span class="role-value" id="masterDevice">No conectado</span>
+            </div>
+            <div class="role-detail">
+              <span class="role-label">Función:</span>
+              <span class="role-value">Escaneo y diagnóstico</span>
+            </div>
+          </div>
+        </div>
+        <div class="role-box slave-box">
+          <h3>SLAVE / TARGET (Dispositivos)</h3>
+          <div class="role-content" id="slaveInfo">
+            <p class="role-desc">Los dispositivos que responden en el bus I²C son <strong>SLAVE/TARGET</strong>. El microcontrolador los interroga y ellos responden.</p>
+            <div class="slave-list" id="slaveList">
+              <p class="empty-text">No hay dispositivos detectados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENT LOG -->
+    <section class="card log-card">
+      <h2 class="card-title"><span class="card-icon">📝</span> Registro de Eventos</h2>
+      <div class="log-controls">
+        <button class="btn btn-small" onclick="App.clearLog()">🗑️ Limpiar</button>
+        <button class="btn btn-small" onclick="App.exportLog()">📋 Copiar log</button>
+      </div>
+      <div class="log-console" id="logConsole"></div>
+    </section>
+
+    <!-- FINAL RESULT -->
+    <section class="card final-card">
+      <h2 class="card-title"><span class="card-icon">📊</span> Resultado Final</h2>
+      <div class="final-grid" id="finalResults">
+        <div class="final-item">
+          <span class="final-number" id="finalTotal">0</span>
+          <span class="final-label">Dispositivos encontrados</span>
+        </div>
+        <div class="final-item stable">
+          <span class="final-number" id="finalStable">0</span>
+          <span class="final-label">Estables</span>
+        </div>
+        <div class="final-item suspicious">
+          <span class="final-number" id="finalSuspicious">0</span>
+          <span class="final-label">Sospechosos</span>
+        </div>
+        <div class="final-item danger">
+          <span class="final-number" id="finalDanger">0</span>
+          <span class="final-label">Posible falla</span>
+        </div>
+      </div>
+      <div class="final-explanation" id="finalExplanation"></div>
+    </section>
+
+    <!-- EXPORT -->
+    <section class="card export-card">
+      <h2 class="card-title"><span class="card-icon">💾</span> Exportar Diagnóstico</h2>
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="App.exportJSON()">
+          <span class="btn-icon">📄</span> Exportar JSON
+        </button>
+        <button class="btn btn-secondary" onclick="App.exportCSV()">
+          <span class="btn-icon">📊</span> Exportar CSV
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Antony el tonto XD — Herramienta de diagnóstico I²C | <a href="https://github.com" target="_blank">GitHub</a></p>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="js/serial.js"></script>
+  <script src="js/i2c.js"></script>
+  <script src="js/diagnostics.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
