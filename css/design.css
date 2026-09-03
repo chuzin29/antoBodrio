@@ -180,3 +180,10 @@ table tbody tr:hover { background: rgba(91,140,255,.06); }
 
 /* Red de seguridad: ninguna tarjeta puede quedar invisible por animaciones */
 .reveal:not(.visible) { opacity: 1 !important; transform: none !important; }
+
+/* FIX RAÍZ de desapariciones: style.css deja .card con opacity:0 de base y
+   animation cardAppear forwards. Al cambiar de vista, viewIn reemplaza esa
+   animación y al terminar la tarjeta vuelve a opacity:0 (desaparece).
+   Se apaga cardAppear y la base queda visible; viewIn sigue dando la entrada. */
+.card { opacity: 1 !important; transform: none; animation: none; }
+main.view-anim [data-view-card]:not(.view-hidden) { animation: viewIn .28s ease both; }
