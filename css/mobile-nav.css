@@ -76,6 +76,8 @@ main.view-anim [data-view-card]:not(.view-hidden) { animation: viewIn .28s ease;
 /* ---------- Móvil ---------- */
 @media (max-width: 900px) {
   #tabBar { display: block; }
+  /* En móvil la abeja vive en la barra inferior: se oculta la burbuja flotante */
+  #antopupis-widget .bee-chat-toggle { display: none !important; }
   body.has-nav main.main-container, body.has-nav header.header { padding-bottom: 0; }
   body.has-nav { padding-bottom: 76px; }
   #navToggle { display: none !important; }

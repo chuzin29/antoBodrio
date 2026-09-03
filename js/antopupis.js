@@ -158,6 +158,12 @@ const Antopupis = (() => {
       if (r.ok) { const d = await r.json(); if (pickContent(d)) return d; }
       console.warn('Groq directo:', r.status);
     } catch (e) { console.warn('Groq directo fallo (CORS/red):', e.message); }
+    // 3) Pollinations (proxy abierto, mismo formato OpenAI)
+    try {
+      const r = await post('https://text.pollinations.ai/openai');
+      if (r.ok) { const d = await r.json(); if (pickContent(d)) return d; }
+      console.warn('Pollinations:', r.status);
+    } catch (e) { console.warn('Pollinations fallo:', e.message); }
     return null;
   }
 
@@ -265,6 +271,9 @@ const Antopupis = (() => {
       .replace(/\n/g, '<br>');
   }
 
-  document.addEventListener('DOMContentLoaded', init);
-  return { toggle, send, saveKey };
+  // Arranque blindado: si DOMContentLoaded ya pasó o el widget no quedó, reintenta
+  if (document.readyState !== 'loading') { try { init(); } catch (e) { console.warn(e); } }
+  else document.addEventListener('DOMContentLoaded', init);
+  setTimeout(() => { if (!document.getElementById('antopupis-widget')) { try { init(); } catch (e) { console.warn(e); } } }, 2500);
+  return { toggle, send, saveKey, ensure: init };
 })();

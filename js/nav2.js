@@ -3,7 +3,7 @@
  * Se engancha a LabUI.show sin modificarlo.
  */
 const Nav2 = (() => {
-  const ORDER = ['dashboard', 'lab', 'i2c', 'signals', 'diag', 'arduino', 'components', 'reports', 'learn', 'config'];
+  const ORDER = ['dashboard', 'lab', 'i2c', 'signals', 'diag', 'arduino', 'components', 'reports', 'learn', 'config', 'tools'];
   const TABS = ['dashboard', 'lab', 'i2c', 'diag']; // acceso directo + Señales? -> 5 tabs:
   const TAB_IDS = ['dashboard', 'lab', 'i2c', 'signals', 'diag'];
   const META = {
@@ -17,6 +17,7 @@ const Nav2 = (() => {
     reports: ['Reportes', 'Genera y revisa reportes técnicos.'],
     learn: ['Aprender', 'Conceptos I2C cortos y prácticos.'],
     config: ['Config', 'Tema, sonido, API key e historial.'],
+    tools: ['Herramientas', 'Cálculos, checklist y bitácora de planta.'],
   };
   const svg = p => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
   const ICONS = {};
@@ -42,9 +43,11 @@ const Nav2 = (() => {
     tab.setAttribute('aria-label', 'Navegación principal');
     tab.innerHTML = '<div class="tab-row">' +
       TAB_IDS.map(v => '<button class="tab-btn" data-tab="' + v + '">' + icon(v) + '<span>' + shortName(v) + '</span></button>').join('') +
+      '<button class="bee-fab" id="beeFab" aria-label="Asistente IA Antopupis"><svg width="28" height="28" viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="8" ry="7" fill="#F5C518" stroke="#8B6914" stroke-width="1.5"/><rect x="12" y="15" width="8" height="2" rx="1" fill="#1a1a1a"/><rect x="12" y="19" width="8" height="2" rx="1" fill="#1a1a1a"/><circle cx="10" cy="12" r="3.4" fill="rgba(200,220,255,.65)"/><circle cx="22" cy="12" r="3.4" fill="rgba(200,220,255,.65)"/></svg></button>' +
       '<button class="tab-btn" data-tab="__more">' + svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>') + '<span>Más</span></button>' +
       '</div>';
     document.body.appendChild(tab);
+    document.getElementById('beeFab').onclick = () => { window.Antopupis && Antopupis.toggle(); };
     tab.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
       const v = b.dataset.tab;
       if (v === '__more') openSheet();
@@ -80,7 +83,7 @@ const Nav2 = (() => {
     });
     // agrupa y numera el sidebar desktop
     if (side) {
-      const groups = [['Principal', ['dashboard', 'lab', 'i2c', 'signals', 'diag']], ['Herramientas', ['arduino', 'components', 'reports', 'learn', 'config']]];
+      const groups = [['Principal', ['dashboard', 'lab', 'i2c', 'signals', 'diag']], ['Herramientas', ['arduino', 'components', 'reports', 'learn', 'config', 'tools']]];
       const items = {};
       side.querySelectorAll('.nav-item').forEach(b => items[b.dataset.view] = b);
       side.querySelectorAll('.nav-item,.nav-group').forEach(n => n.remove());

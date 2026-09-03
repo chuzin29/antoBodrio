@@ -114,6 +114,17 @@ body.has-nav header.header, body.has-nav main.main-container { max-width: 1100px
 #sim3dCanvas { width: 100%; height: 340px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #05080f; }
 .view-hidden { display: none !important; }
 
+/* ---------- Caja de herramientas ---------- */
+.tb-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tb-out { font-size: 13px; margin-top: 8px; color: var(--text-primary); }
+.tb-row input, .tb-row select { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; padding: 8px; min-height: 44px; font-size: 14px; }
+.tb-check label, label.chk { display: flex; gap: 8px; align-items: center; padding: 6px 0; font-size: 13px; cursor: pointer; }
+.tb-check input, label.chk input { width: 20px; height: 20px; accent-color: #f5b301; flex: none; }
+
+/* ---------- FAB abeja en tab bar ---------- */
+.bee-fab { flex: none; align-self: center; width: 54px; height: 54px; margin-top: -24px; border-radius: 50%; border: 3px solid var(--bg-secondary); background: radial-gradient(circle at 35% 30%, #ffe066, #f5b301 70%); cursor: pointer; box-shadow: 0 4px 16px rgba(245,179,1,.5); display: flex; align-items: center; justify-content: center; }
+.bee-fab:active { transform: scale(.92); }
+
 @media (max-width: 900px) {
   body.has-nav { padding-left: 0; }
   #sideNav { transform: translateX(-100%); width: 240px; }

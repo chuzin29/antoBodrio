@@ -15,6 +15,7 @@ const LabUI = (() => {
     { id: 'reports', name: 'Reportes', icon: '<path d="M6 2h9l5 5v15H6zM14 2v6h6"/>' },
     { id: 'learn', name: 'Aprender', icon: '<path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>' },
     { id: 'config', name: 'Config', icon: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/>' },
+    { id: 'tools', name: 'Herramientas', icon: '<path d="M14 6l4 4L8 20H4v-4L14 6zm1-5l4 4-2 2-4-4 2-2z"/>' },
   ];
   let current = 'dashboard';
   let lastStress = null;
@@ -82,11 +83,14 @@ const LabUI = (() => {
     const cfg = card('Configuración',
       '<div class="cfg-row"><label>API Key de Groq</label><input type="text" id="cfgKey" placeholder="gsk_... (vacío = modo local)"><button class="btn btn-primary" id="btnKeySave">Guardar</button></div><div class="cfg-row"><button class="btn btn-secondary" id="btnCfgTheme">Alternar tema</button><button class="btn btn-secondary" id="btnCfgSound">Alternar sonido</button><button class="btn btn-secondary" id="btnHistClear">Borrar historial</button></div><p style="font-size:12.5px;color:var(--text-muted);margin-top:8px">Estructura del proyecto: js/ plano (sin framework, estático para GitHub Pages). Arduino: js/serial.js · IA: js/antopupis.js · Diagnóstico: js/diagnostics.js · Lab: js/vlab.js + módulos.</p>', VIEWS[9].icon);
 
+    const tools = card('Caja de herramientas del ingeniero',
+      '<p style="font-size:13px;color:var(--text-secondary)">Cálculos y utilidades de planta. Todo local, sin internet.</p><div id="toolbox"></div>', VIEWS[10].icon);
+
     const tmp = document.createElement('div');
-    tmp.innerHTML = dash + lab + i2cExtra + sig + stress + cmp + comp + rep + learn + cfg;
-    const buckets = { dashboard: [], lab: [], i2c: [], signals: [], diag: [], arduino: [], components: [], reports: [], learn: [], config: [] };
+    tmp.innerHTML = dash + lab + i2cExtra + sig + stress + cmp + comp + rep + learn + cfg + tools;
+    const buckets = { dashboard: [], lab: [], i2c: [], signals: [], diag: [], arduino: [], components: [], reports: [], learn: [], config: [], tools: [] };
     // clasifica nuevas por orden conocido
-    const order = ['dashboard', 'lab', 'lab', 'lab', 'lab', 'i2c', 'signals', 'signals', 'diag', 'arduino', 'components', 'reports', 'learn', 'config'];
+    const order = ['dashboard', 'lab', 'lab', 'lab', 'lab', 'i2c', 'signals', 'signals', 'diag', 'arduino', 'components', 'reports', 'learn', 'config', 'tools'];
     [...tmp.children].forEach((el, i) => { el.dataset.viewCard = order[i]; main.appendChild(el); });
 
     bindAll();
@@ -102,6 +106,7 @@ const LabUI = (() => {
     });
     if (v === 'lab' && window.Sim3D) { Sim3D.init(); setTimeout(() => { try { Sim3D.rebuild(); } catch (e) {} }, 350); }
     if (v === 'signals' && window.Scope) setTimeout(() => { try { Scope.capture(); } catch (e) {} }, 150);
+    if (v === 'tools' && window.Toolbox) { try { Toolbox.renderAll(); } catch (e) {} }
     if (window.UX) UX.refreshReveal();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -276,6 +281,7 @@ const LabUI = (() => {
       cf.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => ComponentsDB.render('catGrid', b.dataset.cat));
     }
     Learn.render('learnList');
+    if (window.Toolbox) { try { Toolbox.renderAll(); } catch (e) {} }
     // protocolo
     const sel = document.getElementById('selProtoAddr');
     if (sel) {
